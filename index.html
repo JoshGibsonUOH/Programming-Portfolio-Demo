@@ -52,7 +52,7 @@
     }
 
     public virtual void Attack() {
-        Console.WriteLine($"\{Name} attacks!");
+        Console.WriteLine(name + " attacks!");
     }
 }`,
       Player: `public class Player : Character {
@@ -64,7 +64,7 @@
     }
 
     public override void Attack() {
-        Console.WriteLine($"\{Name} strikes with a sword!");
+        Console.WriteLine(name + " strikes with a sword!");
     }
 }`,
       Enemy: `public class Enemy : Character {
@@ -76,7 +76,7 @@
     }
 
     public override void Attack() {
-        Console.WriteLine($"\{Name} the \{Type} lunges!");
+        Console.WriteLine(name + " the " + type + " lunges!");
     }
 }`
     };

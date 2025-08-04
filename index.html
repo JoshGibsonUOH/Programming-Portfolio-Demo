@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Programming Portfolio: Test Site</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #editor {
+      width: 100%;
+      height: 600px;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white p-6">
+  <div class="max-w-7xl mx-auto flex gap-6">
+    <!-- Sidebar Buttons -->
+    <div class="w-1/4 space-y-4">
+      <button class="btn w-full bg-blue-600 hover:bg-blue-700" onclick="switchClass('Character')">Character.cs</button>
+      <button class="btn w-full bg-green-600 hover:bg-green-700" onclick="switchClass('Player')">Player.cs</button>
+      <button class="btn w-full bg-red-600 hover:bg-red-700" onclick="switchClass('Enemy')">Enemy.cs</button>
+      <button class="btn w-full bg-gray-600 hover:bg-gray-700" onclick="resetCode()">Reset Code</button>
+    </div>
+
+    <!-- Monaco Editor Container -->
+    <div class="w-3/4">
+      <div id="editor" class="bg-gray-800"></div>
+    </div>
+  </div>
+
+  <!-- Monaco Editor via CDN -->
+  <script type="module">
+    import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/+esm';
+
+    const codeMap = {
+      Character: `public class Character {
+    public string Name { get; set; }
+    public int Health { get; set; }
+
+    public Character(string name, int health) {
+        Name = name;
+        Health = health;
+    }
+
+    public virtual void Attack() {
+        Console.WriteLine($"\{Name} attacks!");
+    }
+}`,
+      Player: `public class Player : Character {
+    public int Level { get; set; }
+
+    public Player(string name, int health, int level) 
+        : base(name, health) {
+        Level = level;
+    }
+
+    public override void Attack() {
+        Console.WriteLine($"\{Name} strikes with a sword!");
+    }
+}`,
+      Enemy: `public class Enemy : Character {
+    public string Type { get; set; }
+
+    public Enemy(string name, int health, string type)
+        : base(name, health) {
+        Type = type;
+    }
+
+    public override void Attack() {
+        Console.WriteLine($"\{Name} the \{Type} lunges!");
+    }
+}`
+    };
+
+    let editor;
+    const modelMap = {};
+    let currentFile = 'Character';
+
+    function createModel(name) {
+      if (modelMap[name]) return modelMap[name];
+      const uri = monaco.Uri.parse(`file:///${name}.cs`);
+      const model = monaco.editor.createModel(codeMap[name], 'csharp', uri);
+      modelMap[name] = model;
+      return model;
+    }
+
+    function switchClass(name) {
+      currentFile = name;
+      const model = createModel(name);
+      editor.setModel(model);
+    }
+
+    function resetCode() {
+      if (modelMap[currentFile]) {
+        modelMap[currentFile].setValue(codeMap[currentFile]);
+      }
+    }
+
+    // Initialize Editor AFTER DOM loads
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialModel = createModel('Character');
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        model: initialModel,
+        theme: 'vs-dark',
+        fontSize: 14,
+        automaticLayout: true,
+        minimap: { enabled: false }
+      });
+    });
+
+    // Expose controls
+    window.switchClass = switchClass;
+    window.resetCode = resetCode;
+  </script>
+</body>
+</html>
